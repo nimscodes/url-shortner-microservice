@@ -21,14 +21,22 @@ app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
 
+function isValidHttpUrl(http_url) {
+  try {
+    const url = new URL(http_url);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (err) {
+    return false;
+  }
+}
+
 app.post("/api/shorturl", (req, res) => {
   const originalUrl = req.body.url;
 
  // Validate the URL
- if (!validator.isURL(originalUrl)) {
-  return res.status(400).json({ error: 'invalid url' });
-}
-
+  if (!isValidHttpUrl(originalUrl)){
+    res.status(400).json({error: "invalid url"});
+  }
   //check if url is already in the database
   const foundKey = Object.keys(urlDatabase).find(
     (key) => urlDatabase[key] === originalUrl);
